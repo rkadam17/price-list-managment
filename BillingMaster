@@ -1,0 +1,11 @@
+select
+
+[VBRK_BillingDate] as "Calendar Day Key",
+[VBRP_MaterialNo] as "Material",
+[VBRK_SalesOrg] as "Sales Org",
+[ZNET_BILL_USD] as "Net Billing $",
+[VBRP_NetBillQty] as "Net Billing Qty"
+
+from [cur_sdb].[FactBillingItem]
+where [VBRK_SalesOrg] in ('C510','C550')
+AND  [VBRK_BillingDate] > DATEADD(year, -2,GETDATE())
