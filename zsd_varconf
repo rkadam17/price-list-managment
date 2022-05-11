@@ -1,0 +1,23 @@
+
+SELECT
+
+    [cuobj] as "Object no.",
+    [vkorg] as "SOrg.",
+    [spart] as "Dv",
+    [zz_catalog_id] as "Catalog ID for VC",
+	  [MATNR] as "Material",
+    [spras] as "Language",
+	  [kbetr] as "OSP",
+	  [zaal] as "AAL",
+	  [cbase] as "OSP_COMM", 
+	  [caal] as "AAL_COMM",
+	  [pcif] as "Flag Update",
+	  [fkbetr] as "FOSP", 
+	  [fzaal] as "FAAL", 
+	  [fcbase] as "FOSP_COMM", 
+	  [fcaal] as "FAAL_COMM", 
+	  [erdat] as "Created on", 
+	  [kdatu] as "CondPrcgDt"
+
+  FROM [cur_mdm].[DimVarConfigInfo]
+  where [vkorg] in ('C510','C550')
