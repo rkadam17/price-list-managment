@@ -1,0 +1,8 @@
+select
+
+[matnr],
+[vkorg],
+[zz_catalog_id]
+
+from [cur_mdm].[DimVarConfigInfo]
+where [vkorg] in ('C550','C510')
