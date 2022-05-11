@@ -1,0 +1,7 @@
+Select 
+	     [Product_Hierarchy] as "Product Hierarchy Node"
+      ,[Product_Hierarchy_Description] as "Product Hierarchy Node Name"
+   
+
+from [cur_mdm].[DimMaterialSalesOrg]
+where [Sales_Organization] in ('C510','C550')
