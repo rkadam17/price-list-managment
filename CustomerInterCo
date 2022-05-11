@@ -1,0 +1,14 @@
+select
+
+cs.[KNVV_Customer] as "Customer",
+cm.[KNA1_AccountGrp] as "Customer Account Group",
+cm.[Name_1] as "Customer Name",
+cs.[KNVV_SalesOrg] as "Sales Organization",
+cs.[KNVV_Division] as "Division",
+cm.[IndustryCode1] as "Industry Code"
+
+from [cur_mdm].[DimCustomerSales] cs
+left join [cur_mdm].[DimCustomerMaster] cm
+on cs.[KNVV_Customer] = cm.[Customer_Number]
+where cm.[KNA1_AccountGrp] = 'ZINT'
+and  cs.[KNVV_SalesOrg] in ('C510','C550')
