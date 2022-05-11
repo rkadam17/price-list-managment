@@ -1,0 +1,75 @@
+select
+
+  sol.[vbap_salesdocument] as "Sales Document"
+  ,sol.[vbap_salesitem] as "Sales Document Item"
+  ,sol.[vbap_createdby] as "Created By User"
+  ,cast(sol.[vbap_createdon] as date) as "Creation Date"
+  ,sol.[vbap_division] as "Division"
+  ,sol.[vbap_higherlevitem] as "Higher Level Item"
+  ,sol.[vbap_prodhierarchy] as "Product Hierarchy"
+  ,cast(sol.[vbap_createdon] as date) as "Sales Document Date"
+  ,sol.[vbap_salesitemcategory] as "Sales Document Item Category"
+  ,sol.[vbap_material] as "Material"
+  ,sol.[vbap_salesitemdescript] as "Sales Document Item Text"
+  ,sol.[vbap_rejectionreason] as "Sales Document Reject Reason"
+  ,sol.[VBAK_Salesdoctype] as "Sales Document Type"
+  ,sol.[VBAK_SalesOrg] as "Sales Organization"
+  ,sol.[vbap_shippingpoint] as "Shipping Point"
+  ,sol.[vbap_subtotal2] as "Subtotal 2 Amount"
+  ,sol.[VBAP_Orderquantity] as "Order Quantity"
+,ZPR1."ZPR1 Amount"
+  ,ZPR2."ZPR2 Amount"
+  ,ZVA0."ZVA0 Amount"
+  ,bline."Billed Qty"
+
+from [cur_sdb].[FactSalesItem] sol
+
+left join (Select
+                cond1.[VBAP_SalesDocnumber] as "SalesDocument"
+                ,cond1.[VBAP_SalesItem] as "SalesDocumentItem"
+                ,sum(cond1.[PRCD_CondValue]) as "ZPR1 Amount"
+
+              from [cur_mas].[DimSalesConditionOrders] cond1
+              where cond1.[PRCD_SalesOrg] in ('C510','C550')
+                and cond1.[PRCD_CondType] like 'ZPR1'
+              group by cond1.[VBAP_SalesDocnumber], cond1.[VBAP_SalesItem]) ZPR1
+  on   sol.[vbap_salesdocument] = ZPR1.[SalesDocument] and sol.[vbap_salesitem]  = ZPR1.[SalesDocumentItem]
+
+left join (Select
+                cond2.[VBAP_SalesDocnumber] as "SalesDocument"
+                ,cond2.[VBAP_SalesItem] as "SalesDocumentItem"
+                ,sum(cond2.[PRCD_CondValue]) as "ZVA0 Amount"
+              from  [cur_mas].[DimSalesConditionOrders] cond2
+              where cond2.[PRCD_SalesOrg] in ('C510','C550')
+                and cond2.[PRCD_CondType] like 'ZVA0'
+                group by cond2.[VBAP_SalesDocnumber],cond2.[VBAP_SalesItem]) ZVA0
+  on sol.[vbap_salesdocument]  = ZVA0.[SalesDocument] and sol.[vbap_salesitem] = ZVA0.[SalesDocumentItem]
+
+    left join (Select
+                cond3.[VBAP_SalesDocnumber] as "SalesDocument"
+                ,cond3.[VBAP_SalesItem] as "SalesDocumentItem"
+                ,sum(cond3.[PRCD_CondValue]) as "ZPR2 Amount"
+
+              from [cur_mas].[DimSalesConditionOrders] cond3
+              where cond3.[PRCD_SalesOrg]  in ('C510','C550')
+                and cond3.[PRCD_CondType] like 'ZPR2'
+              --  and cond3."ConditionIsInactive" = ''
+                group by cond3.[VBAP_SalesDocnumber],cond3.[VBAP_SalesItem] ) ZPR2
+  on sol.[vbap_salesdocument] = ZPR2.[SalesDocument] and sol.[vbap_salesitem]= ZPR2.[SalesDocumentItem]
+
+    left join (select
+                b1.[VBAP_SalesDocument] AS "SalesDocument"
+                ,b1.[VBAP_SalesItem] AS "SalesDocumentItem"
+                ,max(b1.[VBRP_NetBillQty]) as "Billed Qty"
+                from [cur_sdb].[FactBillingItem] b1
+                where b1.[VBRK_SalesOrg] in ('C510','C550')
+                group by b1.[VBAP_SalesDocument], b1.[VBAP_SalesItem]) bline
+  on sol.[vbap_salesdocument] = bline.[SalesDocument] and sol.[vbap_salesitem] = bline.[SalesDocumentItem] 
+                
+   
+where sol.[VBAK_SalesOrg] in ('C510','C550')
+  and sol.[vbap_createdon]  >= '01/01/2021'
+  and sol.[vbap_rejectionreason] IS NULL
+and ZPR2."ZPR2 Amount" > 0
+ 
+              
