@@ -1,0 +1,18 @@
+select
+sol.[vbap_higherlevitem] as "HigherLevelItem"
+,sol.[vbap_salesdocument] as "SalesDocument"
+,sum(sol.[VBAP_Cost]) as "Cost Amount"
+,max(hgli.[VBAP_Orderquantity]) as "Parent Qty"
+from [cur_sdb].[FactSalesItem] sol
+
+left join (select * 
+				from [cur_sdb].[FactSalesItem] 
+				where [vbap_higherlevitem] IS NULL
+					and [VBAK_SalesOrg] in ('C510','C550')
+					and [VBAP_Orderquantity]>0) hgli
+	on sol.[vbap_salesdocument] = hgli.[vbap_salesdocument] and sol.[vbap_higherlevitem]  = hgli.[vbap_salesitem]
+
+where sol.[vbap_higherlevitem] IS NOT NULL
+	and sol.[VBAK_SalesOrg] in ('C510','C550')
+	and sol.[VBAP_Orderquantity] >0
+group by sol.[vbap_salesdocument], sol.[vbap_higherlevitem]
