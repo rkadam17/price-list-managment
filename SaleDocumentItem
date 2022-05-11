@@ -1,0 +1,21 @@
+
+select
+
+	sol.[vbap_higherlevitem] as "Higher Level Item"
+	--,sol."ItemGeneralIncompletionStatus" as "Item General Incompletion Status"
+	,sol.[vbap_material] as "Material"
+	,sol.[VBAP_ProdConfig] as "Product Configuration"
+	,sol.[vbap_salesdocument] as "Sales Document"
+	,sol.[vbap_salesitem] as "Sales Document Item"
+	,sol.[vbap_salesitemdescript] as "Sales Document Item Text"
+	,sol.[VBAK_SalesOrg] as "Sales Organization"
+	,sol.[vbap_catalogidforvc] as "ZZ_CATALOG_ID"
+	,sol.[MARA_MaterialType] as "Material Type"
+	,sol.[VBAP_Cost] as "Cost Amount"
+	,sol.[VBAP_Orderquantity] as "Order Quantity"
+
+from [cur_sdb].[FactSalesItem] sol
+
+where sol.[VBAK_SalesOrg] in ('C510','C550')
+	and sol.[VBAP_ProdConfig] not like '000000000000000000'
+    and sol.[MARA_MaterialType] like 'ZCFG'
